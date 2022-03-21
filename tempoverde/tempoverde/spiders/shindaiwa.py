@@ -2,6 +2,7 @@ from email.mime import image
 from numpy import product
 import scrapy
 from tempoverde.items import ImgItem
+import logging
 
 
 class ShindaiwaSpider(scrapy.Spider):
@@ -28,7 +29,7 @@ class ShindaiwaSpider(scrapy.Spider):
                 'https://www.shindaiwa-italia.it/prodotti/accessori/dischi-di-taglio',
                 'https://www.shindaiwa-italia.it/prodotti/accessori/altri-accessori',
                 'https://www.shindaiwa-italia.it/prodotti/accessori/protettivo-catene',
-                'https://www.shindaiwa-italia.it/system/product_category/image/88/box_olio-mix.jpg',
+                'https://www.shindaiwa-italia.it/prodotti/accessori/olio-mix',
                 'https://www.shindaiwa-italia.it/prodotti/accessori/abbigliamento-antitaglio',
                 'https://www.shindaiwa-italia.it/prodotti/accessori/abbigliamento-protettivo',
                 'https://www.shindaiwa-italia.it/prodotti/accessori/abbigliamento-casual',
@@ -46,25 +47,34 @@ class ShindaiwaSpider(scrapy.Spider):
     def parse_products(self, response):
         descrizione = response.css('h1::text').get().strip() if response.css('h1::text').get() is not None else None
         #sottocategoria = response.css('li.expanded.active-trail a:first-child::text').get().strip() if response.css('li.expanded.active-trail a:first-child::text').get() is not None else None
-        price = response.css('h2.c-product__price::text').get().strip() if response.css('h2.c-product__price::text').get() is not None else None
-        description = response.css('div#long-description::text').get().strip() if response.css('div.content.product-page div.description::text').get() is not None else None
-        details = response.xpath('//*[@class="c-product__data"]/table//tr').xpath('normalize-space()').getall() if response.css('div#description ul li').get() is not None else None
-        if details is not []:
-            note = "\n".join(details)
-            yield {'Note': note,}
+        price = response.css('h2.c-product__price::text').get().strip().replace("€","").replace(" ","").replace(".","").replace("*","") if response.css('h2.c-product__price::text').get() is not None else None
+        description = response.css('div#long-description p::text').get().strip() if response.css('div#long-description p::text').get() is not None else None
+        details = response.xpath('//*[@class="c-product__data"]/table//tr').xpath('normalize-space()').getall() if response.xpath('//*[@class="c-product__data"]/table//tr').get() is not None else None
+        logging.debug("=============================")
+        logging.debug(description)
 
-        img = ImgItem()
-        img['image_urls'] = [response.urljoin(response.css('ul.c-slider__wrap  img::attr(src)').get())]
-        img['image_name'] = descrizione.replace(" ","-")
+        note = ""
+
+        if description is not None:
+            note = description
+
+        if details is not None:
+            note = note +"\n".join(details)
+
 
         yield {
-           # 'Sottocategoria': sottocategoria,
+            # 'Sottocategoria': sottocategoria,
             'Descrizione': descrizione,
             'Listino 4 (ivato)': price,
             'Produttore': "Shindaiwa",
             'Cod. Fornitore': "0000",
             'Categoria': "Macchine",
             'Internet': response.url,
+            'Note': note,
         }
+
+        img = ImgItem()
+        img['image_urls'] = [response.urljoin(response.css('ul.c-slider__wrap  img::attr(src)').get())]
+        img['image_name'] = descrizione.replace(" ","-").replace("/", "-")
 
         yield img

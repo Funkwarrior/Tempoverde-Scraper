@@ -25,6 +25,10 @@ ITEM_PIPELINES = {'tempoverde.pipelines.CustomImagesPipeline': 1}
 IMAGES_STORE = "./images"
 
 
+# Desired file format
+FEED_FORMAT = "xlsx"
+
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'tempoverde (+http://www.yourdomain.com)'
 

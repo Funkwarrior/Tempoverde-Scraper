@@ -14,6 +14,7 @@ class ActiveSpider(scrapy.Spider):
 
     custom_settings = {
         'IMAGES_STORE': './images/active',
+        'FEED_URI' : "./active.xlsx"
     }
 
     def parse(self, response):
@@ -26,13 +27,12 @@ class ActiveSpider(scrapy.Spider):
         price = 0
         description = response.css('div.content.product-page div.description::text').get().strip() if response.css('div.content.product-page div.description::text').get() is not None else None
         details = response.xpath('//*[@id="description"]/div/div/ul/li').xpath('normalize-space()').getall() if response.css('div#description ul li').get() is not None else None
-        details_list = "\n".join(details)
-        note = details_list
+        note = "\n".join(details)
 
         img = ImgItem()
         img['image_urls'] = [response.css('article.product-page div.image-box div.general-img img:first-child::attr(src)').get()]
         img['image_name'] = descrizione.replace(" ","-")
-        # yield img
+
 
         yield {
             'Sottocategoria': sottocategoria,
@@ -42,5 +42,7 @@ class ActiveSpider(scrapy.Spider):
             'Produttore': "Active srl",
             'Cod. Fornitore': "0000",
             'Categoria': "Macchine",
-            'Internet': response.url
+            'Internet': response.url,
         }
+
+        yield img

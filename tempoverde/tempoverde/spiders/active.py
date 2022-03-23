@@ -2,6 +2,8 @@ from email.mime import image
 from numpy import product
 import scrapy
 from tempoverde.items import ImgItem
+import pandas as pd
+import logging
 
 class ActiveSpider(scrapy.Spider):
     name = 'active'
@@ -33,6 +35,12 @@ class ActiveSpider(scrapy.Spider):
         img['image_urls'] = [response.css('article.product-page div.image-box div.general-img img:first-child::attr(src)').get()]
         img['image_name'] = descrizione.replace(" ","-")
 
+        df = pd.read_excel('Active2021.xlsx')
+        logging.debug(df)
+        prod_cod = df.loc[df['Descrizione'] == img['image_name'], 'Codice'].item()
+        prod_price = df.loc[df['Descrizione'] == img['image_name'], 'Listino iva compresa'].item()
+        logging.debug("=============================")
+        logging.debug(prod_cod, prod_price)
 
         yield {
             'Sottocategoria': sottocategoria,

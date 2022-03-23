@@ -37,7 +37,7 @@ class JdSpider(scrapy.Spider):
         img['image_name'] = img_name
         specs = response.xpath("//div[@class='details']/ul//li").xpath('normalize-space()').getall()
         details = response.xpath("//div[@class='specifications-comp nav-section']//div[@class='table-container']//tr").xpath('normalize-space()').getall()
-        note = "\n".join(specs) + "\n" + "\n".join(details)
+        note = "\"" + "\n".join(specs) + "\n" + "\n".join(details) + "\""
 
         yield {
             'Sottocategoria': response.css('h1 span.category::text').get().strip() if response.css('h1 span.category::text').get() is not None else None,

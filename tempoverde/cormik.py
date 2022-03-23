@@ -9,16 +9,14 @@ F36 SDK TOSASIEPI
 
 import requests
 import pandas as pd
+from requests.auth import HTTPBasicAuth
 
 url = "https://cormik.ev-portal.com/Service/ProdRegGetMachModels"
 
 SDK_type = ["F37", "F32", "F30", "F36"]
-SDK_info=[]
 
 for type in range(len(SDK_type)):
   querystring = {"machType": SDK_type[type]}
-
-  print(querystring)
   payload = ""
   headers = {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0",
@@ -34,8 +32,11 @@ for type in range(len(SDK_type)):
       "Sec-Fetch-Site": "same-origin"
   }
 
-  r = requests.request("GET", url, data=payload, headers=headers, params=querystring)
-  data = r.json()
+  r = requests.request("GET", url, data=payload, headers=headers, params=querystring, auth = HTTPBasicAuth('CO15459000', 'tanaka09/2'))
+  print(r.text)
+  #data = r.json()
+  #print(data)
+  #df = pd.json_normalize(data)
+  #df = df.append(df)
 
-  for p in data:
-    print
+#df.to_csv('shindaiwa_codes.csv')

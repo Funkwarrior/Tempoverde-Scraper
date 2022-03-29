@@ -19,8 +19,8 @@ class JdSpider(scrapy.Spider):
         ]
 
     custom_settings = {
-        'IMAGES_STORE': './images/jd',
-        'FEED_URI' : "./jd.xlsx",
+        'IMAGES_STORE': './../output/images/jd',
+        'FEED_URI' : "./../output/jd.xlsx",
         'FEED_EXPORT_FIELDS': ["Descrizione", "Categoria", "Sottocategoria", "Listino 4 (ivato)", "Note", "Produttore", "Cod. Fornitore", "Categoria", "Immagine", "Internet"],
     }
 

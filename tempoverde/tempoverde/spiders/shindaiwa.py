@@ -36,8 +36,8 @@ class ShindaiwaSpider(scrapy.Spider):
                 ]
 
     custom_settings = {
-        'IMAGES_STORE': './images/shindaiwa',
-        'FEED_URI' : "./shindaiwa.xlsx"
+        'IMAGES_STORE': './../output/images/shindaiwa',
+        'FEED_URI' : "./../output/shindaiwa.xlsx"
     }
 
     def parse(self, response):

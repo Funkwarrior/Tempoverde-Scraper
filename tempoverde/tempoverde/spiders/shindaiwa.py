@@ -64,13 +64,12 @@ class ShindaiwaSpider(scrapy.Spider):
         if details is not None:
             note = note +"\n".join(details)
 
-
         yield {
             # 'Sottocategoria': sottocategoria,
             'Descrizione': descrizione,
             'Listino 4 (ivato)': price,
             'Produttore': "Shindaiwa",
-            'Cod. Fornitore': "0000",
+            'Cod. Fornitore': "0024", # Cormik
             'Categoria': "Macchine",
             'Internet': response.url,
             'Note': note,

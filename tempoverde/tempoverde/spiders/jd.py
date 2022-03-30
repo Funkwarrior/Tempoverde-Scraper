@@ -40,7 +40,7 @@ class JdSpider(scrapy.Spider):
             'Listino 4 (ivato)': response.css('div.price span.value::text').get().strip().replace('*' , '').replace(' ', '').replace('€','') if response.css('div.price span.value::text').get() is not None else None,
             'Note': note,
             'Produttore': "John Deere",
-            'Cod. Fornitore': "0000",
+            'Cod. Fornitore': "1751", # DOSE GIARDINAGGO s.n.c. di Dose Roberto & C.
             'Categoria': "Macchine",
             'Immagine' : "C:\\ImmaginiDanea\\jd\\"+img_name+".jpg",
             'Internet' : response.url,

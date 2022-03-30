@@ -11,8 +11,3 @@ class TempoverdeItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     pass
-
-class ImgItem(Item):
-    image_name = Field()
-    image_urls = Field()
-    pass

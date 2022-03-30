@@ -1,7 +1,6 @@
 from email.mime import image
 from numpy import product
 import scrapy
-from tempoverde.items import ImgItem
 import logging
 
 
@@ -37,7 +36,8 @@ class ShindaiwaSpider(scrapy.Spider):
 
     custom_settings = {
         'IMAGES_STORE': './../output/images/shindaiwa',
-        'FEED_URI' : "./../output/shindaiwa.xlsx"
+        'FEED_URI' : "./../output/shindaiwa.xlsx",
+        'FEED_EXPORT_FIELDS': ["Descrizione", "Categoria", "Sottocategoria", "Listino 4 (ivato)", "Note", "Produttore", "Cod. Fornitore", "Categoria", "Immagine", "Internet"],
     }
 
     def parse(self, response):
@@ -45,11 +45,14 @@ class ShindaiwaSpider(scrapy.Spider):
             yield response.follow(link.get(), callback=self.parse_products)
 
     def parse_products(self, response):
-        descrizione = response.css('h1::text').get().strip() if response.css('h1::text').get() is not None else None
+        descrizione = response.css('h1::text').get().strip().capitalize() if response.css('h1::text').get() is not None else None
         #sottocategoria = response.css('li.expanded.active-trail a:first-child::text').get().strip() if response.css('li.expanded.active-trail a:first-child::text').get() is not None else None
         price = response.css('h2.c-product__price::text').get().strip().replace("€","").replace(" ","").replace(".","").replace("*","") if response.css('h2.c-product__price::text').get() is not None else None
-        description = response.css('div#long-description p::text').get().strip() if response.css('div#long-description p::text').get() is not None else None
+        description = response.css('div#long-description p::text').get().strip().capitalize() if response.css('div#long-description p::text').get() is not None else None
         details = response.xpath('//*[@class="c-product__data"]/table//tr').xpath('normalize-space()').getall() if response.xpath('//*[@class="c-product__data"]/table//tr').get() is not None else None
+        img_name = descrizione.replace(" ","-").replace("/", "-").replace(",", "").capitalize()
+        img_src = [response.urljoin(response.css('ul.c-slider__wrap  img::attr(src)').get())]
+
         logging.debug("=============================")
         logging.debug(description)
 
@@ -71,10 +74,7 @@ class ShindaiwaSpider(scrapy.Spider):
             'Categoria': "Macchine",
             'Internet': response.url,
             'Note': note,
+            'Immagine': "C:\\ImmaginiDanea\\sdk\\"+img_name+".jpg",
+            'image_urls' : img_src,
+            'image_name' : img_name,
         }
-
-        img = ImgItem()
-        img['image_urls'] = [response.urljoin(response.css('ul.c-slider__wrap  img::attr(src)').get())]
-        img['image_name'] = descrizione.replace(" ","-").replace("/", "-")
-
-        yield img

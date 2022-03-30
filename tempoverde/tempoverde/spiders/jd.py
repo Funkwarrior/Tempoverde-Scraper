@@ -1,7 +1,6 @@
 from dataclasses import replace
 from itertools import product
 import scrapy
-from tempoverde.items import ImgItem
 import logging
 
 class JdSpider(scrapy.Spider):
@@ -29,15 +28,11 @@ class JdSpider(scrapy.Spider):
             yield response.follow(link.get(), callback=self.parse_products)
 
     def parse_products(self, response):
-
-        img_name = response.css('h1 span.model::text').get().strip().replace(" ","-")
-        img_src = response.xpath('//*[@class="image-wrapper slides"]/li/picture/source[3]/@srcset').get()
-        img = ImgItem()
-        img['image_urls'] = [response.urljoin(img_src)]
-        img['image_name'] = img_name
         specs = response.xpath("//div[@class='details']/ul//li").xpath('normalize-space()').getall()
         details = response.xpath("//div[@class='specifications-comp nav-section']//div[@class='table-container']//tr").xpath('normalize-space()').getall()
-        note = "\"" + "\n".join(specs) + "\n" + "\n".join(details) + "\""
+        note = "\n".join(specs) + "\n" + "\n".join(details)
+        img_name = response.css('h1 span.model::text').get().strip().replace(" ","-")
+        img_src = [response.urljoin(response.xpath('//*[@class="image-wrapper slides"]/li/picture/source[3]/@srcset').get())]
 
         yield {
             'Sottocategoria': response.css('h1 span.category::text').get().strip() if response.css('h1 span.category::text').get() is not None else None,
@@ -49,5 +44,6 @@ class JdSpider(scrapy.Spider):
             'Categoria': "Macchine",
             'Immagine' : "C:\\ImmaginiDanea\\jd\\"+img_name+".jpg",
             'Internet' : response.url,
+            'image_urls' : img_src,
+            'image_name' : img_name,
         }
-        yield img

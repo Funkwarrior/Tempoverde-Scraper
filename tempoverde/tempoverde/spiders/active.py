@@ -1,7 +1,6 @@
 from email.mime import image
 from numpy import product
 import scrapy
-from tempoverde.items import ImgItem
 import pandas as pd
 import logging
 
@@ -16,7 +15,8 @@ class ActiveSpider(scrapy.Spider):
 
     custom_settings = {
         'IMAGES_STORE': './../output/images/active',
-        'FEED_URI' : "./../output/active.xlsx"
+        'FEED_URI' : "./../output/active.xlsx",
+        'FEED_EXPORT_FIELDS': ["Descrizione", "Categoria", "Sottocategoria", "Listino 4 (ivato)", "Note", "Produttore", "Cod. Fornitore", "Categoria", "Immagine", "Internet"],
     }
 
     def parse(self, response):
@@ -30,10 +30,8 @@ class ActiveSpider(scrapy.Spider):
         description = response.css('div.content.product-page div.description::text').get().strip() if response.css('div.content.product-page div.description::text').get() is not None else None
         details = response.xpath('//*[@id="description"]/div/div/ul/li').xpath('normalize-space()').getall() if response.css('div#description ul li').get() is not None else None
         note = "\n".join(details)
-
-        img = ImgItem()
-        img['image_urls'] = [response.css('article.product-page div.image-box div.general-img img:first-child::attr(src)').get()]
-        img['image_name'] = descrizione.replace(" ","-")
+        img_name = descrizione.replace(" ","-")
+        img_src = [response.urljoin(response.css('article.product-page div.image-box div.general-img img:first-child::attr(src)').get())]
 
         #df = pd.read_excel('Active2021.xlsx')
         #logging.debug(df)
@@ -51,6 +49,7 @@ class ActiveSpider(scrapy.Spider):
             'Cod. Fornitore': "0000",
             'Categoria': "Macchine",
             'Internet': response.url,
+            'Immagine': "C:\\ImmaginiDanea\\active\\"+img_name+".jpg",
+            'image_urls' : img_src,
+            'image_name' : img_name,
         }
-
-        yield img

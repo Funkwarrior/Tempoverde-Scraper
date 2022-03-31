@@ -46,18 +46,23 @@ class ShindaiwaSpider(scrapy.Spider):
 
     def parse_products(self, response):
         descrizione = response.css('h1::text').get().strip().capitalize() if response.css('h1::text').get() is not None else None
-        #sottocategoria = response.css('li.expanded.active-trail a:first-child::text').get().strip() if response.css('li.expanded.active-trail a:first-child::text').get() is not None else None
+        sottocategoria = response.css('li.expanded.active-trail a:first-child::text').get().strip() if response.css('li.expanded.active-trail a:first-child::text').get() is not None else None
         price = response.css('h2.c-product__price::text').get().strip().replace("€","").replace(" ","").replace(".","").replace("*","") if response.css('h2.c-product__price::text').get() is not None else None
-        description = response.css('div#long-description p::text').get().strip().capitalize() if response.css('div#long-description p::text').get() is not None else None
+        try:
+            description = response.css('div#long-description p::text').get().strip().capitalize() if response.css('div#long-description p::text').get() is not None else None
+        except:
+            description = response.css('div.c-product__text p::text').get().strip().capitalize() if response.css('div.c-product__text p::text').get() is not None else None
+
         details = response.xpath('//*[@class="c-product__data"]/table//tr').xpath('normalize-space()').getall() if response.xpath('//*[@class="c-product__data"]/table//tr').get() is not None else None
         img_name = descrizione.replace(" ","-").replace("/", "-").replace(",", "").capitalize()
         img_src = [response.urljoin(response.css('ul.c-slider__wrap  img::attr(src)').get())]
 
-        logging.debug("=============================")
-        logging.debug(description)
+        if "accessori" in response.url:
+            categoria = "Accessori"
+        else:
+            categoria =  "Macchine"
 
         note = ""
-
         if description is not None:
             note = description
 
@@ -65,12 +70,12 @@ class ShindaiwaSpider(scrapy.Spider):
             note = note +"\n".join(details)
 
         yield {
-            # 'Sottocategoria': sottocategoria,
+            'Sottocategoria': sottocategoria,
             'Descrizione': descrizione,
             'Listino 4 (ivato)': price,
             'Produttore': "Shindaiwa",
             'Cod. Fornitore': "0024", # Cormik
-            'Categoria': "Macchine",
+            'Categoria': categoria,
             'Internet': response.url,
             'Note': note,
             'Immagine': "C:\\ImmaginiDanea\\sdk\\"+img_name+".jpg",

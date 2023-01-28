@@ -8,7 +8,7 @@ try:
         [
             'scrapy',
             'crawl',
-            'active'
+            'hva'
         ]
     )
 except SystemExit:

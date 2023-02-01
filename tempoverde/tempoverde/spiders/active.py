@@ -3,7 +3,10 @@ from numpy import product
 import scrapy
 import pandas as pd
 import logging
+import os
+from pathlib import Path
 
+SpreadsheetSource = Path(__file__).parent.parent.parent.parent /  "listini/Active2023.xlsx"
 class ActiveSpider(scrapy.Spider):
     name = 'active'
     allowed_domains = ['www.active-srl.com']
@@ -11,6 +14,13 @@ class ActiveSpider(scrapy.Spider):
         'https://www.active-srl.com/it/catalogo/rasaerba/macchine-specifiche-mulching',
         'https://www.active-srl.com/it/catalogo/rasaerba/scocca-lamiera',
         'https://www.active-srl.com/it/catalogo/rasaerba/scocca-alluminio',
+        'https://www.active-srl.com/it/catalogo/generatori/generatori-di-corrente',
+        'https://www.active-srl.com/it/catalogo/trivelle',
+        'https://www.active-srl.com/it/catalogo/decespugliatori/professionali-zaino-multifunzione',
+        'https://www.active-srl.com/it/catalogo/rasaerba/macchine-specifiche-mulching',
+        'https://www.active-srl.com/it/catalogo/arieggiatore',
+        'https://www.active-srl.com/it/catalogo/motozappe'
+
         ]
 
     custom_settings = {
@@ -19,7 +29,7 @@ class ActiveSpider(scrapy.Spider):
         'FEED_EXPORT_FIELDS': ["Cod.", "Descrizione", "Categoria", "Sottocategoria", "Listino 4 (ivato)", "Note", "Produttore", "Cod. Fornitore", "Categoria", "Immagine", "Internet"],
     }
 
-    df = pd.read_excel('./../listini/Active2021.xlsx')
+    df = pd.read_excel(SpreadsheetSource)
 
     def parse(self, response):
         for link in response.css('div.product a.see-details-hover::attr(href)'):
@@ -34,7 +44,7 @@ class ActiveSpider(scrapy.Spider):
         img_name = descrizione.replace(" ","-")
         img_src = [response.urljoin(response.css('article.product-page div.image-box div.general-img img:first-child::attr(src)').get())]
         prod_cod = self.df.loc[self.df["Descrizione"] == descrizione.upper(), "Codice"].item()
-        prod_price = self.df.loc[self.df["Descrizione"] == descrizione.upper(), "Listino iva compresa"].item()
+        prod_price = self.df.loc[self.df["Descrizione"] == descrizione.upper(), "Pubblico +IVA"].item()
 
         yield {
             'Cod.': prod_cod,

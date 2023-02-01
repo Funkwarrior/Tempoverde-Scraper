@@ -6,7 +6,7 @@ import logging
 import os
 from pathlib import Path
 
-SpreadsheetSource = Path(__file__).parent.parent.parent.parent /  "listini/Active2023.xlsx"
+SpreadsheetSource = Path(__file__).parent.parent.parent.parent / "listini/Active2023.xlsx"
 class ActiveSpider(scrapy.Spider):
     name = 'active'
     allowed_domains = ['www.active-srl.com']
@@ -19,8 +19,7 @@ class ActiveSpider(scrapy.Spider):
         'https://www.active-srl.com/it/catalogo/decespugliatori/professionali-zaino-multifunzione',
         'https://www.active-srl.com/it/catalogo/rasaerba/macchine-specifiche-mulching',
         'https://www.active-srl.com/it/catalogo/arieggiatore',
-        'https://www.active-srl.com/it/catalogo/motozappe'
-
+        'https://www.active-srl.com/it/catalogo/motozappe',
         ]
 
     custom_settings = {
